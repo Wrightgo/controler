@@ -1,0 +1,15 @@
+/Creates new Word document instance for Word processing.
+WordDocument document = new WordDocument();
+/Opens the template Word document.
+String basePath = getDataDir("Template.docx");
+document.open(basePath, FormatType.Docx);
+/Retrieves the mail merge data.
+MailMergeDataTable dataTable = getMailMergeDataTable();
+/Executes nested Mail merge using implicit relational data.
+document.getMailMerge().executeNestedGroup(dataTable);
+/Removes empty page at the end of Word document.
+removeEmptyPage(document);
+/Saves the document in the given name and format.
+document.save("Report.docx", FormatType.Docx);
+/Release the resources occupied by the WordDocument instance.
+document.close();
