@@ -1,0 +1,43 @@
+/**
+* 
+* Gets the mail merge data table.
+* 
+* @return
+*/
+private static MailMergeDataTable getMailMergeDataTable() throws Exception
+{
+    // Gets the customer details implicit as "IEnumerable" collection.
+    ListSupport<CustomerDetails> customers = new ListSupport<CustomerDetails>(CustomerDetails.class);
+    FileStreamSupport stream = new FileStreamSupport(getDataDir("CustomerDetails.xml"), FileMode.OpenOrCreate);
+    XmlReaderSupport reader = XmlReaderSupport.create(stream);
+    while (reader.getNodeType().getEnumValue() != XmlNodeType.Element.getEnumValue())
+        reader.read();
+    reader.read();
+    while (reader.getNodeType().getEnumValue() == XmlNodeType.Whitespace.getEnumValue())
+        reader.read();
+    while (!(reader.getLocalName() == "CustomerDetails"))
+    {
+        if (reader.getNodeType().getEnumValue() == XmlNodeType.Element.getEnumValue())
+        {
+            switch ((reader.getLocalName()) == null ? "string_null_value" : (reader.getLocalName())) 
+           {
+                case "Customers":
+                    customers.add(getCustomer(reader));
+                    break;
+           }
+        }
+        else
+        {
+            reader.read();
+            if ((reader.getLocalName() == "CustomerDetails")
+                && reader.getNodeType().getEnumValue() == XmlNodeType.EndElement.getEnumValue())
+                break;
+        }
+    }
+    reader.close();
+    stream.close();
+    // Creates an instance of "MailMergeDataTable" by specifying mail merge group
+    // name and "IEnumerable" collection.
+    MailMergeDataTable dataTable = new MailMergeDataTable("Customers", customers);
+    return dataTable;
+}
